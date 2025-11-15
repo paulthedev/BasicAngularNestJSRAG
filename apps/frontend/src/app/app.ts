@@ -1,13 +1,17 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
+import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { Footer } from './components/footer/footer';
+import { Navbar } from './components/navbar/navbar';
+import { HamburgerMenu } from './components/hamburger-menu/hamburger-menu';
 
 @Component({
-  imports: [NxWelcome, RouterModule],
   selector: 'app-root',
+  imports: [RouterOutlet, Footer, Navbar, HamburgerMenu],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App {
-  protected title = 'BasicAngularNestJSRAG';
+  protected readonly title = signal('Basic Rag');
+  cartItemCount = 3; // Mock cart item count
+  constructor() {}
 }

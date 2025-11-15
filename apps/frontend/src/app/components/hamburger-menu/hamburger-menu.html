@@ -1,0 +1,18 @@
+<div class="hamburger-menu-overlay" [class.open]="isMenuOpen()" (click)="closeMenu()"></div>
+<div class="hamburger-menu" [class.open]="isMenuOpen()">
+  <div class="hamburger-menu-header">
+    <h3>{{ title }}</h3>
+    <button class="close-btn" (click)="closeMenu()" aria-label="Close menu">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+  <nav class="hamburger-menu-nav">
+    <ul>
+      <li><a routerLink="/" (click)="closeMenu()">Home</a></li>
+      <li><a routerLink="/products" (click)="closeMenu()">Products</a></li>
+      <li><a routerLink="/about" (click)="closeMenu()">About</a></li>
+      <li><a routerLink="/contact" (click)="closeMenu()">Contact</a></li>
+      <li><a routerLink="/cart" (click)="closeMenu()">Cart</a></li>
+    </ul>
+  </nav>
+</div>

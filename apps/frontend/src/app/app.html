@@ -1,2 +1,8 @@
-<app-nx-welcome></app-nx-welcome>
-<router-outlet></router-outlet>
+<main class="d-flex flex-column min-vh-100">
+  <app-navbar [title]="title()"></app-navbar>
+  <div class="outlet-area">
+    <router-outlet />
+  </div>
+  <app-footer></app-footer>
+  <app-hamburger-menu [title]="title()"></app-hamburger-menu>
+</main>
