@@ -8,20 +8,20 @@ import { PaginationOptionsDTO, PaginatedResultDTO, DocumentDTO } from '@basic-an
 import { DocumentMapper } from '../mappers/document.mapper';
 
 @Injectable()
-export class ProductsService {
+export class DocumentsService {
     constructor(
         @InjectRepository(Document)
-        private readonly productRepository: Repository<Document>,
+        private readonly documentepository: Repository<Document>,
         private readonly embeddingsService: EmbeddingsService,
         private readonly rerankService: RerankService
     ) {}
 
-    async search(query?: string, options?: PaginationOptionsDTO): Promise<PaginatedResultDTO<DocumentDTO>> {
+    async search(query: string, options?: PaginationOptionsDTO): Promise<PaginatedResultDTO<DocumentDTO>> {
         const page = options?.page || 1;
         const limit = options?.limit || 10;
         const skip = (page - 1) * limit;
 
-        const queryBuilder = this.productRepository.createQueryBuilder('documents');
+        const queryBuilder = this.documentepository.createQueryBuilder('documents');
 
         // Apply text search if provided
         if (query) {

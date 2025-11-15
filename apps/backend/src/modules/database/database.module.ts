@@ -1,17 +1,14 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
-import { Document } from '../../../shared/entities/document.entity';
+import { PGliteDriver } from 'typeorm-pglite';
+import { Document } from '../../shared/entities/document.entity';
 
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env['DB_HOST'] || 'localhost',
-      port: parseInt(process.env['DB_PORT'] as string) || 5432,
-      username: process.env['DB_USERNAME'] || 'postgres',
-      password: process.env['DB_PASSWORD'] || 'postgres',
-      database: process.env['DB_NAME'] || 'BasicRAG',
+      driver: new PGliteDriver().driver,
       entities: [Document],
       synchronize: true,
       logging: false,
