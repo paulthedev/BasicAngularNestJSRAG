@@ -16,5 +16,10 @@ export class AppController {
     this.documentService.save(document);
   }
 
+  @Post('documents/analyseDocuments')
+  analyseDocuments(@Query() question: string){
+    this.documentService.analyseDocuments(question);
+  }
+
 }
 
