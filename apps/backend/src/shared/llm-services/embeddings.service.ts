@@ -46,6 +46,7 @@ export class EmbeddingsService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
+    this.context.dispose();
     this.model.dispose();
   }
 }

@@ -25,8 +25,10 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "node-llama-cpp": "^3.14.2",
+    "pdfjs-dist": "^5.4.394",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.8.0",
+    "tesseract.js": "^6.0.1",
     "typeorm-pglite": "^0.3.2",
     "zone.js": "~0.15.0"
   },

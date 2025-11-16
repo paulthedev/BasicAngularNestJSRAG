@@ -56,4 +56,9 @@ export class DocumentsService {
             }
         };
     }
+
+    async save(document: DocumentDTO){
+        const entity = DocumentMapper.toEntity(document);
+        this.documentepository.save(entity);
+    }
 }

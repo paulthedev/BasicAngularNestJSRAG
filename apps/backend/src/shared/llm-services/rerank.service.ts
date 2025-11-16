@@ -34,6 +34,7 @@ export class RerankService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
+    this.context.dispose();
     this.model.dispose();
   }
 }

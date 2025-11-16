@@ -24,7 +24,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     const contextOprions: LlamaContextOptions = {
         flashAttention: true,
-        contextSize: 10000,
+        contextSize: 40000,
         threads: 15,
         batchSize: 128,
         sequences: 1
@@ -39,12 +39,19 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         contextSequence: this.context.getSequence(),
         autoDisposeSequence: true
     });
-    const reply = await session.prompt(query);
+    const reply = await session.prompt(query, {
+      temperature: 0.7,
+      topK: 20, 
+      topP: 0.95,
+      minP: 0,
+      repeatPenalty: { penalty : 1.05 }
+    });
     session.dispose();
     return reply;
   }
 
   async onModuleDestroy() {
+    this.context.dispose();
     this.model.dispose();
   }
 }
