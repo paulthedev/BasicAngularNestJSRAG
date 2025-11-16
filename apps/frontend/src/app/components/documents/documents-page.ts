@@ -7,7 +7,7 @@ import Tesseract from 'tesseract.js';
 
 @Component({
   selector: 'app-documents-page',
-  imports: [RouterLink, FormsModule],
+  imports: [FormsModule],
   templateUrl: 'documents-page.html',
   styleUrls: ['documents-page.scss']
 })
