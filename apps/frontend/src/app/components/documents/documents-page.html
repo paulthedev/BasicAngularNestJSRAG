@@ -1,0 +1,113 @@
+<div class="container mt-4">
+    <h2>Documents</h2>
+    
+    <!-- Document Upload Section -->
+    <div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+        <i class="bi bi-upload me-2"></i>Upload Documents
+        </h5>
+    </div>
+    <div class="card-body">
+        <!-- Drag and Drop Area -->
+        <div 
+            class="border border-dashed rounded p-4 mb-3 text-center cursor-pointer"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($event)"
+            (click)="fileInput.click()"
+        >
+            <i class="bi bi-cloud-upload fs-1 text-muted mb-2 d-block"></i>
+            <p class="mb-2">Drag & drop PDF files here or click to browse</p>
+            <p class="text-muted small mb-0">Supports multiple files</p>
+        </div>
+
+        <!-- Hidden file input -->
+        <input 
+            type="file" 
+            #fileInput
+            class="d-none" 
+            accept=".pdf"
+            (change)="onFileSelected($event)"
+            multiple
+        >
+
+        <!-- Selected Files List -->
+        @if(selectedFiles().length > 0) {
+            <div class="mt-3">
+                <h6>Selected Files:</h6>
+                <ul class="list-group">
+                    @for(file of selectedFiles(); track file.name) {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ file.name }}</span>
+                            <span class="badge bg-secondary">{{ (file.size / 1024 / 1024).toFixed(2) }} MB</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <!-- Process Button -->
+        <div class="d-grid gap-2 mt-3">
+        <button 
+            class="btn btn-primary" 
+            [disabled]="selectedFiles().length === 0 || isProcessing()"
+            (click)="processDocuments()">
+            <i class="bi bi-file-earmark-medical me-2"></i>
+            {{ isProcessing() ? 'Processing...' : 'Process Documents' }}
+        </button>
+        </div>
+
+        <!-- OCR Processing Status -->
+        <div class="mt-3" *ngIf="processingStatus()">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            {{ processingStatus() }}
+        </div>
+        </div>
+
+        <!-- Upload Status -->
+         @if(uploadStatus()){
+            <div class="mt-3">
+                @if(uploadStatus() === 'success'){
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>
+                        All documents processed and uploaded successfully!
+                    </div>
+                }
+                @else{
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Error uploading documents
+                    </div>
+                }
+            </div>
+         }
+        
+    </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+        <i class="bi bi-search me-2"></i>Search Documents
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="input-group">
+        <span class="input-group-text">
+            <i class="bi bi-search"></i>
+        </span>
+        <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Search documents..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()"
+        >
+        <button class="btn btn-outline-secondary">
+            <i class="bi bi-search"></i>
+        </button>
+        </div>
+    </div>
+    </div>

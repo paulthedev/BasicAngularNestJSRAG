@@ -20,6 +20,10 @@
           {
             "glob": "**/*",
             "input": "apps/frontend/public"
+          },
+          {
+            "glob": "pdf.worker.min.mjs",
+            "input": "node_modules/pdfjs-dist/build/"
           }
         ],
         "styles": ["apps/frontend/src/styles.scss"]

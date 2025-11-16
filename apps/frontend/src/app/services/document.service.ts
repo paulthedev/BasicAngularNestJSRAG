@@ -1,0 +1,17 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { DocumentDTO } from '@basic-angular-nest-jsrag/sharedDTO';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class DocumentService {
+  private readonly apiUrl = 'localhost:3000/api'; // This should be your actual API base URL
+
+  constructor(private http: HttpClient) {
+  }
+
+  uploadDocument(documentData: Partial<DocumentDTO>) {
+   return this.http.post(this.apiUrl+'/documents/upload', documentData);
+  }
+}
