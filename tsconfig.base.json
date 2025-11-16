@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@basic-angular-nest-jsrag/sharedDTO": ["libs/sharedDTO/src/index.ts"]
+      "@basic-angular-nestjs-rag/sharedDTO": ["libs/sharedDTO/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,5 +1,5 @@
 import { Document } from '../entities/document.entity';
-import { DocumentDTO } from '@basic-angular-nest-jsrag/sharedDTO';
+import { DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
 
 export class DocumentMapper {
   static toDTO(document: Document): DocumentDTO {

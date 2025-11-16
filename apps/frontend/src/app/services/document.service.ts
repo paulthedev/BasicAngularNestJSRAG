@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { DocumentDTO } from '@basic-angular-nest-jsrag/sharedDTO';
+import { DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
 
 @Injectable({
   providedIn: 'root',

@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DocumentService } from '../../services/document.service';
-import { DocumentDTO } from '@basic-angular-nest-jsrag/sharedDTO';
+import { DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
 import Tesseract from 'tesseract.js';
 
 @Component({

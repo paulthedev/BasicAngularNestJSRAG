@@ -4,7 +4,7 @@ import { Document } from '../entities/document.entity';
 import { Repository } from 'typeorm';
 import { EmbeddingsService } from '../llm-services/embeddings.service';
 import { RerankService } from '../llm-services/rerank.service';
-import { PaginationOptionsDTO, PaginatedResultDTO, DocumentDTO } from '@basic-angular-nest-jsrag/sharedDTO';
+import { PaginationOptionsDTO, PaginatedResultDTO, DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
 import { DocumentMapper } from '../mappers/document.mapper';
 
 @Injectable()

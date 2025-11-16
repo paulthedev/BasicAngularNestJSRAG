@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Query, Body } from '@nestjs/common';
 import { DocumentsService } from '../shared/services/document.service';
-import { DocumentDTO, PaginatedResultDTO } from '@basic-angular-nest-jsrag/sharedDTO';
+import { DocumentDTO, PaginatedResultDTO } from '@basic-angular-nestjs-rag/sharedDTO';
 
 @Controller()
 export class AppController {
