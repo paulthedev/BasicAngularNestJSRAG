@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, SecurityContext, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DocumentService } from '../../services/document.service';
 import { DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
@@ -28,7 +28,6 @@ export class DocumentsPageComponent {
   searchResults = signal<any[]>([]);
   isLoading = signal(false);
   private documentService = inject(DocumentService);
-  private sanitizer = inject(DomSanitizer);
 
   onFileSelected(event: any): void {
     const files: File[] = Array.from(event.target.files);
@@ -127,8 +126,8 @@ export class DocumentsPageComponent {
           .map((item: any) => item.str)
           .join(' ');
 
-        const sanitizedPageText = this.sanitizer.sanitize( SecurityContext.HTML, pageText);
-        
+        const sanitizedPageText = pageText.toLowerCase().normalize('NFKC').replace(/\0/g, '');
+
         pages.push({
           name: file.name,
           content: sanitizedPageText || '', // Filled TODO
