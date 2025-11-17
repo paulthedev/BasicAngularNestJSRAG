@@ -3,6 +3,15 @@ import { FormsModule } from '@angular/forms';
 import { DocumentService } from '../../services/document.service';
 import { DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
 import Tesseract from 'tesseract.js';
+// Import pdfjs-dist library
+import * as pdfjsLib from 'pdfjs-dist';
+import { GlobalWorkerOptions } from 'pdfjs-dist';
+
+// IMPORTANT: Configure the worker source for pdfjs-dist
+// Ensure you have copied 'pdf.worker.mjs' or 'pdf.worker.js' to your assets folder
+// via your angular.json configuration.
+GlobalWorkerOptions.workerSrc = 'pdf.worker.min.mjs';
+
 
 @Component({
   selector: 'app-documents-page',
@@ -10,7 +19,7 @@ import Tesseract from 'tesseract.js';
   templateUrl: 'documents-page.html',
   styleUrls: ['documents-page.scss']
 })
-export class DocumentsPageComponent implements OnInit,OnDestroy {
+export class DocumentsPageComponent implements OnInit, OnDestroy {
   selectedFiles = signal<File[]>([]);
   isProcessing = signal(false);
   processingStatus = signal<string | null>(null);
@@ -20,7 +29,6 @@ export class DocumentsPageComponent implements OnInit,OnDestroy {
   isLoading = signal(false);
   private documentService = inject(DocumentService);
 
-  // Define the number of workers you want to use
   Tesseract_num_workers = 4;
   scheduler: Tesseract.Scheduler | null = null;
 
@@ -59,24 +67,20 @@ export class DocumentsPageComponent implements OnInit,OnDestroy {
     }
   }
 
-  // Function to initialize the scheduler and workers
   private async initializeTesseractScheduler() {
-    if (this.scheduler) return; // Initialize only once
+    if (this.scheduler) return;
 
     this.scheduler = Tesseract.createScheduler();
-    const workers = [];
     
-    // Create and add 4 workers to the scheduler
+    // Create and add workers with 'eng' language pack
     for (let i = 0; i < this.Tesseract_num_workers; i++) {
-      const worker = await Tesseract.createWorker('eng'); // Create a worker with the English language pack
-      workers.push(worker);
+      const worker = await Tesseract.createWorker('eng'); 
       this.scheduler.addWorker(worker);
     }
     
     console.log(`Tesseract.js scheduler initialized with ${this.Tesseract_num_workers} workers.`);
   }
 
-  // Function to terminate the scheduler and all workers when done (e.g., on app teardown)
   private async terminateTesseractScheduler() {
     if (this.scheduler) {
       await this.scheduler.terminate();
@@ -95,42 +99,96 @@ export class DocumentsPageComponent implements OnInit,OnDestroy {
     this.processingStatus.set(`Processing ${files.length} documents...`);
     
     try {
-      // Process all documents in batch
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        this.processingStatus.set(`Processing document ${i+1} of ${files.length}: ${file.name}`);
+        this.processingStatus.set(`Extracting images from document ${i+1} of ${files.length}: ${file.name}`);
         
-        // Send the job to the scheduler. It will pick the next available worker.
-        const { data: { text: extractedText } } = await this.scheduler.addJob('recognize', file);
+        // Use pdfjs-dist to get images from the PDF
+        const images = await this.extractImagesFromPdf(file);
         
+        let fullText = '';
+        for (let j = 0; j < images.length; j++) {
+          this.processingStatus.set(`OCR'ing page ${j+1} of ${images.length} for ${file.name}`);
+          // Send each image (canvas) to the scheduler for OCR
+          const { data: { text: extractedText } } = await this.scheduler.addJob('recognize', images[j]);
+          fullText += extractedText + '\n\n';
+        }
+
         const documentData: Partial<DocumentDTO> = {
           name: file.name,
-          content: extractedText
+          content: fullText.trim()
         };
 
-        // Upload each processed document
-        this.documentService.uploadDocument(documentData).subscribe({
-          next: () => {
-            console.log(`Document ${file.name} uploaded successfully`);
-            this.processingStatus.set(`Document ${i+1} of ${files.length} (${file.name}) uploaded successfully`);
-          },
-          error: (error) => {
-            console.error(`Error uploading document ${file.name}:`, error);
-            this.processingStatus.set(`Error uploading document ${file.name}`);
-          }
+        // Upload the combined text content for the document via a Promise wrapper
+        await new Promise<void>((resolve, reject) => {
+          this.documentService.uploadDocument(documentData).subscribe({
+            next: () => {
+              console.log(`Document ${file.name} uploaded successfully`);
+              resolve();
+            },
+            error: (error) => {
+              console.error(`Error uploading document ${file.name}:`, error);
+              reject(error);
+            }
+          });
         });
       }
 
-      // Set status after processing all files
       this.processingStatus.set('All documents processed and uploaded successfully!');
       this.uploadStatus.set('success');
+      this.isProcessing.set(false);
 
     } catch (error) {
-      console.error('Error processing documents with Tesseract:', error);
+      console.error('Error processing documents:', error);
       this.processingStatus.set('Error processing documents');
       this.isProcessing.set(false);
     }
   }
+
+  // Helper function to convert File to a usable URL for pdf.js
+  private fileToURL(file: File): Promise<string> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target?.result as string);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Function to extract images (as canvas elements) from a PDF file using pdfjs-dist
+  private async extractImagesFromPdf(file: File): Promise<HTMLCanvasElement[]> {
+    const fileUrl = await this.fileToURL(file);
+    const loadingTask = pdfjsLib.getDocument(fileUrl);
+    const pdf = await loadingTask.promise;
+    const canvasElements: HTMLCanvasElement[] = [];
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      // Scale determines the quality/resolution of the rendered image
+      const scale = 2; 
+      const viewport = page.getViewport({ scale: scale });
+
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) {
+        throw new Error("Could not get canvas context");
+      }
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      // Type inferred by TS to avoid explicit 'RenderParameters' import error
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport,
+        canvas: canvas 
+      };
+
+      await page.render(renderContext).promise;
+      canvasElements.push(canvas);
+    }
+    
+    return canvasElements;
+  }
+
 
   onSearch(): void {
     if (this.searchQuery().trim()) {
