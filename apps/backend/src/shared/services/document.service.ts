@@ -73,29 +73,48 @@ export class DocumentsService {
                 'ASC'
             ).setParameters({ queryEmbedding: `[${queryEmbedding.join(',')}]` });
 
-            let documents = await queryBuilder.limit(5).getMany();
-            documents = await this.rerankService.reRankDocuments(question, documents);
+            const documents = await queryBuilder.limit(5).getMany();
+
             if(documents.length > 0){
-                const concatAllDocuments = documents.map(i => i.content).join('\n');
-                
-                // Create a prompt template that incorporates the document context
-                const promptTemplate = `Based on the following document content, please answer the question: "${prompt}"
-                
-                Document content:
-                ${concatAllDocuments}
+                const rerankedDocuments = await this.rerankService.reRankDocuments(question, documents);
+                if(rerankedDocuments.length > 0){
+                    const concatAllDocuments = documents.map(i =>
+                    +`Document name:\n`
+                    +i.name
+                    +`Document content:\n` 
+                    +i.content).join('\n');
+                    
+                    // Create a prompt template that incorporates the document context
+                    const promptTemplate = `You are a helpful, respectful and honest assistant. Always answer as helpfully as possible.`
+                    +`If a question does not make any sense, or is not factually coherent, explain why instead of answering something incorrectly.`
+                    +`If you don't know the answer to a question, don't share false information.\n`
+                    +`Based on the following document(s) content, please answer the question: "${prompt}"\n`
+                    +`${concatAllDocuments}`;
+                    const response = await this.chatService.prompt(promptTemplate);
 
-                Please provide a detailed and well-structured answer based specifically on the information in the documents above.`;
-                
-                const response = await this.chatService.prompt(promptTemplate);
-
-                return response;
+                    return response;
+                }
+                else{
+                    return 'I didnot find any relevant documents to answer this question.';
+                }
             }
-            
+            else{
+
+                return 'There are no documnets which I can refer to answer this question.';
+            }
+        }
+        else{
+            return 'Please ask a question to get started!';
         }
     }
 
     async save(document: DocumentDTO){
         const entity = DocumentMapper.toEntity(document);
-        this.documentepository.save(entity);
+        const embedding = (await this.embeddingsService.generateEmbedding(
+            +`Document name:\n`
+            +document.name
+            +`Document content:\n` 
+            +document.content)).vector;
+        this.documentepository.save(({...entity, embedding: [...embedding]}));
     }
 }

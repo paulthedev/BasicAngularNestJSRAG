@@ -24,7 +24,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     this.context = await this.model.createContext({
         flashAttention: true,
-        contextSize: 40000,
+        contextSize: 32768,
         threads: 15,
         batchSize: 128,
         sequences: 1
