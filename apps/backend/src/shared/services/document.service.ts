@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Document } from '../entities/document.entity';
 import { Repository } from 'typeorm';
-import { EmbeddingsService } from '../llm-services/embeddings.service';
-import { RerankService } from '../llm-services/rerank.service';
+import { EmbeddingsService } from './embeddings.service';
+import { RerankService } from './rerank.service';
 import { PaginationOptionsDTO, PaginatedResultDTO, DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
 import { DocumentMapper } from '../mappers/document.mapper';
-import { ChatService } from '../llm-services/chat.service';
+import { ChatService } from './chat.service';
 
 @Injectable()
 export class DocumentsService {
@@ -79,16 +79,13 @@ export class DocumentsService {
                 const rerankedDocuments = await this.rerankService.reRankDocuments(question, documents);
                 if(rerankedDocuments.length > 0){
                     const concatAllDocuments = documents.map(i =>
-                    +`Document name:\n`
-                    +i.name
-                    +`Document content:\n` 
-                    +i.content).join('\n');
+                    +i.content).join(' ');
                     
                     // Create a prompt template that incorporates the document context
                     const promptTemplate = `You are a helpful, respectful and honest assistant. Always answer as helpfully as possible.`
                     +`If a question does not make any sense, or is not factually coherent, explain why instead of answering something incorrectly.`
-                    +`If you don't know the answer to a question, don't share false information.\n`
-                    +`Based on the following document(s) content, please answer the question: "${prompt}"\n`
+                    +`If you don't know the answer to a question, don't share false information.`
+                    +`Based on the following document(s) content, please answer the question: "${prompt}"`
                     +`${concatAllDocuments}`;
                     const response = await this.chatService.prompt(promptTemplate);
 
@@ -108,13 +105,25 @@ export class DocumentsService {
         }
     }
 
-    async save(document: DocumentDTO){
-        const entity = DocumentMapper.toEntity(document);
-        const embedding = (await this.embeddingsService.generateEmbedding(
-            +`Document name:\n`
-            +document.name
-            +`Document content:\n` 
-            +document.content)).vector;
-        this.documentepository.save(({...entity, embedding: [...embedding]}));
+    async save(documents: Array<Partial<DocumentDTO>>){
+        const entities = documents.map(d => DocumentMapper.toEntity(d));
+        try{
+            entities.forEach(async (e) => {
+                e.embedding = [...(await this.embeddingsService.generateEmbedding(
+                +`Document name: `
+                +e.name
+                +` Page number: `
+                +e.page
+                +` Document content: ` 
+                +e.content)).vector];
+            });
+        }
+        catch(ex){
+            console.log(ex)
+            throw new InternalServerErrorException('Embedding Failed.', ex);
+        }
+        
+        const cent =this.documentepository.create(entities);
+        this.documentepository.save(cent);
     }
 }

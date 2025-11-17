@@ -30,7 +30,6 @@
     "pdfjs-dist": "^5.4.394",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.8.0",
-    "tesseract.js": "^6.0.1",
     "typeorm-pglite": "^0.3.2",
     "zone.js": "~0.15.0"
   },

@@ -21,11 +21,16 @@ export class EmbeddingsService implements OnModuleInit, OnModuleDestroy {
         modelPath: path.join(__dirname, "assets/modelzoo/Qwen3-Embedding-0.6B-iq4_nl.gguf"),
         gpuLayers: 0
     });
-    this.context = await this.model.createEmbeddingContext();
+    this.context = await this.model.createEmbeddingContext({
+      contextSize: 10000,
+      batchSize: 128,
+      threads: 15
+    });
   }
 
   async generateEmbedding(text: string): Promise<LlamaEmbedding> {
-    return await this.context.getEmbeddingFor(text);
+    const tokens = this.model.tokenize(text , false);
+    return await this.context.getEmbeddingFor(tokens);
   }
 
   async generateEmbeddings(texts: string[]): Promise<Map<string, LlamaEmbedding>> {
@@ -33,7 +38,8 @@ export class EmbeddingsService implements OnModuleInit, OnModuleDestroy {
     
     await Promise.all(
       texts.map(async (text) => {
-        const embedding = await this.context.getEmbeddingFor(text);
+        const tokens = this.model.tokenize(text, false);
+        const embedding = await this.context.getEmbeddingFor(tokens);
         embeddings.set(text, embedding);
       })
     );

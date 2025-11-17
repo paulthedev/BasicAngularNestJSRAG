@@ -7,6 +7,7 @@ export class DocumentMapper {
     const dto: DocumentDTO = {
       id: document.id,
       name: document.name,
+      page: document.page,
       content: document.content,
       embedding: document.embedding,
     };
@@ -21,6 +22,7 @@ export class DocumentMapper {
     const entity: Document = {
       id: documentDTO.id,
       name: documentDTO.name,
+      page: documentDTO.page,
       content: documentDTO.content,
       embedding: documentDTO.embedding,
     } as Document;

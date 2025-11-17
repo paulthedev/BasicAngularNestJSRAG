@@ -11,8 +11,8 @@ export class DocumentService {
   constructor(private http: HttpClient) {
   }
 
-  uploadDocument(documentData: Partial<DocumentDTO>) {
-   return this.http.post(this.apiUrl+'/documents/upload', documentData);
+  uploadByPage(documentsData: Partial<DocumentDTO>[]) {
+   return this.http.post(this.apiUrl+'/documents/uploadbypage', documentsData);
   }
 
   analyseDocuments(question: string) {

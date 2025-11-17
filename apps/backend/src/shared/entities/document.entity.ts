@@ -8,6 +8,9 @@ export class Document {
   @Column({ length: 255 })
   name!: string;
 
+  @Column({ name: 'page', type: 'int' })
+  page!:number;
+
   @Column('text')
   content!: string;
 

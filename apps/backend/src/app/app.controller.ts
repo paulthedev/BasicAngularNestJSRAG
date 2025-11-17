@@ -11,9 +11,9 @@ export class AppController {
     return this.documentService.search(query);
   }
 
-  @Post('documents/upload')
-  uploadDocument(@Body() document: DocumentDTO){
-    this.documentService.save(document);
+  @Post('documents/uploadbypage')
+  uploadDocument(@Body() documents: Array<Partial<DocumentDTO>>){
+    this.documentService.save(documents);
   }
 
   @Post('documents/analyseDocuments')
