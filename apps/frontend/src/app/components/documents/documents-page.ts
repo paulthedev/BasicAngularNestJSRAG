@@ -127,7 +127,8 @@ export class DocumentsPageComponent {
           .map((item: any) => item.str)
           .join(' ');
 
-        const sanitizedPageText = this.sanitizer.sanitize( SecurityContext.HTML, content);
+        const sanitizedPageText = this.sanitizer.sanitize( SecurityContext.HTML, pageText);
+        
         pages.push({
           name: file.name,
           content: sanitizedPageText || '', // Filled TODO
@@ -145,7 +146,7 @@ export class DocumentsPageComponent {
       this.isLoading.set(true);
       this.documentService.analyseDocuments(this.searchQuery()).subscribe({
         next: (results: any) => {
-          this.searchResults.set(results);
+          this.searchResults.set(results || []);
           this.isLoading.set(false);
         },
         error: (error) => {

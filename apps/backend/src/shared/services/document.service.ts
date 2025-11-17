@@ -63,13 +63,13 @@ export class DocumentsService {
     }
 
     async analyseDocuments(question: string){
-        const queryBuilder = this.documentepository.createQueryBuilder('documents');
+        const queryBuilder = this.documentepository.createQueryBuilder('document');
 
         // Apply text search if provided
         if (question) {
             const queryEmbedding = (await this.embeddingsService.generateEmbedding(question)).vector;
             queryBuilder.orderBy(
-                `documents.embedding <=> :queryEmbedding`,
+                `document.embedding <=> :queryEmbedding`,
                 'ASC'
             ).setParameters({ queryEmbedding: `[${queryEmbedding.join(',')}]` });
 
@@ -105,7 +105,7 @@ export class DocumentsService {
         }
     }
 
-    async save(documents: Array<Partial<DocumentDTO>>){
+    async save(documents: Partial<DocumentDTO>[]){
         const entities = documents.map(d => DocumentMapper.toEntity(d));
         try{
             entities.forEach(async (e) => {
@@ -123,7 +123,7 @@ export class DocumentsService {
             throw new InternalServerErrorException('Embedding Failed.', ex);
         }
         
-        const cent =this.documentepository.create(entities);
+        const cent = this.documentepository.create(entities);
         this.documentepository.save(cent);
     }
 }

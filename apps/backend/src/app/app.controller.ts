@@ -12,13 +12,13 @@ export class AppController {
   }
 
   @Post('documents/uploadbypage')
-  uploadDocument(@Body() documents: Array<Partial<DocumentDTO>>){
+  uploadDocument(@Body() documents: Partial<DocumentDTO>[]){
     this.documentService.save(documents);
   }
 
   @Post('documents/analyseDocuments')
-  analyseDocuments(@Query() question: string){
-    this.documentService.analyseDocuments(question);
+  analyseDocuments(@Body() body: any){
+    this.documentService.analyseDocuments(body.question);
   }
 
 }
