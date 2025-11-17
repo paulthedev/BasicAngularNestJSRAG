@@ -1,5 +1,4 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DocumentService } from '../../services/document.service';
 import { DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
@@ -17,6 +16,8 @@ export class DocumentsPageComponent implements OnInit,OnDestroy {
   processingStatus = signal<string | null>(null);
   uploadStatus = signal<string | null>(null);
   searchQuery = signal('');
+  searchResults = signal<any[]>([]);
+  isLoading = signal(false);
   private documentService = inject(DocumentService);
 
   // Define the number of workers you want to use
@@ -86,7 +87,7 @@ export class DocumentsPageComponent implements OnInit,OnDestroy {
 
   async processDocuments(): Promise<void> {
     const files = this.selectedFiles();
-    if (!files.length || !this.scheduler) {
+    if (!files || !this.scheduler) {
       return;
     }
 
@@ -133,8 +134,17 @@ export class DocumentsPageComponent implements OnInit,OnDestroy {
 
   onSearch(): void {
     if (this.searchQuery().trim()) {
-      // In a real implementation, this would call the search API
-      console.log('Searching for:', this.searchQuery());
+      this.isLoading.set(true);
+      this.documentService.analyseDocuments(this.searchQuery()).subscribe({
+        next: (results: any) => {
+          this.searchResults.set(results);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error searching documents:', error);
+          this.isLoading.set(false);
+        }
+      });
     }
   }
 
