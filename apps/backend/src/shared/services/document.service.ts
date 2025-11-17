@@ -64,7 +64,6 @@ export class DocumentsService {
 
     async analyseDocuments(question: string){
         const queryBuilder = this.documentepository.createQueryBuilder('document');
-
         // Apply text search if provided
         if (question) {
             const queryEmbedding = (await this.embeddingsService.generateEmbedding(question)).vector;
@@ -78,14 +77,13 @@ export class DocumentsService {
             if(documents.length > 0){
                 const rerankedDocuments = await this.rerankService.reRankDocuments(question, documents);
                 if(rerankedDocuments.length > 0){
-                    const concatAllDocuments = documents.map(i =>
-                    +i.content).join(' ');
+                    const concatAllDocuments = rerankedDocuments.map(i => i.content).join(' ');
                     
                     // Create a prompt template that incorporates the document context
                     const promptTemplate = `You are a helpful, respectful and honest assistant. Always answer as helpfully as possible.`
                     +`If a question does not make any sense, or is not factually coherent, explain why instead of answering something incorrectly.`
                     +`If you don't know the answer to a question, don't share false information.`
-                    +`Based on the following document(s) content, please answer the question: "${prompt}"`
+                    +`Based on the following document(s) content, please answer the question: "${question}"`
                     +`${concatAllDocuments}`;
                     const response = await this.chatService.prompt(promptTemplate);
 

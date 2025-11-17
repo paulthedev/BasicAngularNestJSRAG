@@ -18,19 +18,21 @@ export class EmbeddingsService implements OnModuleInit, OnModuleDestroy {
     }});
 
     this.model = await this.llama.loadModel({
-        modelPath: path.join(__dirname, "assets/modelzoo/Qwen3-Embedding-0.6B-iq4_nl.gguf"),
-        gpuLayers: 0
+        modelPath: path.join(__dirname, "assets/modelzoo/Qwen3-Embedding-0.6B-Q8_0.gguf"),
+        gpuLayers: 10
     });
     this.context = await this.model.createEmbeddingContext({
-      contextSize: 10000,
-      batchSize: 128,
       threads: 15
     });
   }
 
   async generateEmbedding(text: string): Promise<LlamaEmbedding> {
-    const tokens = this.model.tokenize(text , false);
-    return await this.context.getEmbeddingFor(tokens);
+    const sanitizedText = text.trim().replace(/\s+/g, ' ').toLowerCase().normalize('NFKC')
+    const tokens = this.model.tokenize(sanitizedText, false);
+    console.log('Now Embedding: ');
+    console.log(sanitizedText);
+    const embeddings = await this.context.getEmbeddingFor(tokens);
+    return embeddings;
   }
 
   async generateEmbeddings(texts: string[]): Promise<Map<string, LlamaEmbedding>> {

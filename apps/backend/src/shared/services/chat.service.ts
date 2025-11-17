@@ -19,15 +19,12 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     this.model = await this.llama.loadModel({
         modelPath: path.join(__dirname, "assets/modelzoo/LFM2-1.2B-Q4_K_M.gguf"),
-        gpuLayers: 0
+        gpuLayers: 10
     });
 
     this.context = await this.model.createContext({
         flashAttention: true,
-        contextSize: 32768,
-        threads: 15,
-        batchSize: 128,
-        sequences: 1
+        threads: 15
     });
   }
 
