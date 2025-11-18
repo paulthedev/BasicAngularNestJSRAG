@@ -37,6 +37,11 @@ export class DocumentsPageComponent {
     }
   }
 
+  resetAllStatus(): void {
+    this.processingStatus.set(null);
+    this.uploadStatus.set(null);
+  }
+
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -64,6 +69,9 @@ export class DocumentsPageComponent {
       return;
     }
 
+    // Reset previous status messages
+    this.resetAllStatus();
+    
     this.isProcessing.set(true);
     this.processingStatus.set(`Processing ${files.length} documents for batch upload...`);
     
@@ -89,14 +97,13 @@ export class DocumentsPageComponent {
         console.log(`Batch starting at index ${i} uploaded successfully.`);
       }
 
-      this.uploadStatus.set('success');
+      this.processingStatus.set('All documents processed and uploaded successfully!');
       this.isProcessing.set(false);
       this.selectedFiles.set([]); // Clear selected files after successful upload
 
     } catch (error) {
       console.error('Error processing documents:', error);
       this.processingStatus.set('Error processing documents');
-      this.uploadStatus.set('error');
       this.isProcessing.set(false);
     }
   }
