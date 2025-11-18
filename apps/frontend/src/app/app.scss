@@ -1,0 +1,22 @@
+/* App-wide styles */
+
+/* Ensure proper layout for the fixed navbar and footer */
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.outlet-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--nav-footer-height);
+  height: calc(100vh - var(--nav-footer-height) * 2);
+  margin-bottom: 60px;
+}
+
+/* Make sure footer is properly positioned */
+app-footer {
+  margin-top: auto;
+}
