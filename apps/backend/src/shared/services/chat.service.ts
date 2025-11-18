@@ -19,7 +19,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     this.model = await this.llama.loadModel({
         modelPath: path.join(__dirname, "assets/modelzoo/LFM2-1.2B-Q4_K_M.gguf"),
-        gpuLayers: 5
+        gpuLayers: 15
     });
 
     this.context = await this.model.createContext({
