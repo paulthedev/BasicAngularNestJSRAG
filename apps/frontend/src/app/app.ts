@@ -11,7 +11,7 @@ import { HamburgerMenu } from './components/hamburger-menu/hamburger-menu';
   styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('Basic Rag');
+  protected readonly title = signal('Basic RAG (Retrieval-Augmented Generation)');
   cartItemCount = 3; // Mock cart item count
   constructor() {}
 }
