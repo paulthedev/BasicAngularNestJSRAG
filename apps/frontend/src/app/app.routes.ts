@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { DocumentsPageComponent } from './components/documents/documents-page';
+import { DocumentsPageComponent } from './components/documents-page/documents-page';
 
 export const appRoutes: Route[] = [
   {
