@@ -19,7 +19,7 @@ export class EmbeddingsService implements OnModuleInit, OnModuleDestroy {
 
     this.model = await this.llama.loadModel({
         modelPath: path.join(__dirname, "assets/modelzoo/Qwen3-Embedding-0.6B-Q8_0.gguf"),
-        gpuLayers: 10
+        gpuLayers: 5
     });
     this.context = await this.model.createEmbeddingContext({
       threads: 15

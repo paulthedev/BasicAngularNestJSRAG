@@ -4,7 +4,7 @@ import { Document } from '../entities/document.entity';
 import { Repository } from 'typeorm';
 import { EmbeddingsService } from './embeddings.service';
 import { RerankService } from './rerank.service';
-import { PaginationOptionsDTO, PaginatedResultDTO, DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
+import { PaginationOptionsDTO, PaginatedResultDTO, DocumentDTO, ResponseDTO, ResponseStatusCode } from '@basic-angular-nestjs-rag/sharedDTO';
 import { DocumentMapper } from '../mappers/document.mapper';
 import { ChatService } from './chat.service';
 
@@ -60,10 +60,13 @@ export class DocumentsService {
         };
     }
 
-    async analyseDocuments(question: string){
+    async analyseDocuments(question: string): Promise<ResponseDTO<string>>{
         // Validate input
         if (!question) {
-            return 'Please ask a question to get started!';
+            return {
+                statusCode: ResponseStatusCode.success,
+                data: 'Please ask a question to get started!'
+            };
         }
 
         try {
@@ -82,14 +85,20 @@ export class DocumentsService {
             const documents = await queryBuilder.limit(5).getMany();
 
             if (documents.length === 0) {
-                return 'There are no documents which I can refer to answer this question.';
+                return {
+                    statusCode: ResponseStatusCode.success,
+                    data: 'There are no documents which I can refer to answer this question.'
+                };
             }
 
             // Rerank documents based on relevance to the question
             const rerankedDocuments = await this.rerankService.reRankDocuments(question, documents);
             
             if (rerankedDocuments.length === 0) {
-                return 'I did not find any relevant documents to answer this question.';
+                return {
+                    statusCode: ResponseStatusCode.success,
+                    data: 'I did not find any relevant documents to answer this question.'
+                };
             }
 
             // Concatenate document contents for context
@@ -103,7 +112,11 @@ export class DocumentsService {
             + concatAllDocuments;
             
             const response = await this.chatService.prompt(promptTemplate);
-            return response;
+
+            return {
+                    statusCode: ResponseStatusCode.success,
+                    data: response
+                };
         } catch (error) {
             console.error('Error in analyseDocuments:', error);
             throw new InternalServerErrorException('Failed to analyze documents');
@@ -121,6 +134,10 @@ export class DocumentsService {
 
             const createdEntities = this.documentepository.create(entities);
             await this.documentepository.save(createdEntities);
+            return {
+                statusCode: ResponseStatusCode.success,
+                data: 'Successfully saved data'
+            };
         }
         catch(ex){
             console.log(ex)

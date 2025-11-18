@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
+import { DocumentDTO, ResponseDTO } from '@basic-angular-nestjs-rag/sharedDTO';
+import { Observable, pipe } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -11,11 +13,15 @@ export class DocumentService {
   constructor(private http: HttpClient) {
   }
 
-  uploadByPage(documentsData: Partial<DocumentDTO>[]) {
-   return this.http.post(this.apiUrl+'/documents/uploadbypage', documentsData);
+  uploadByPage(documentsData: Partial<DocumentDTO>[]):Observable<string> {
+   return this.http.post<ResponseDTO<string>>(this.apiUrl+'/documents/uploadbypage', documentsData).pipe(
+      map(response => response.data)
+    );
   }
 
-  analyseDocuments(question: string) {
-    return this.http.post(this.apiUrl + '/documents/analyseDocuments', { question });
+  analyseDocuments(question: string):Observable<string> {
+    return this.http.post<ResponseDTO<string>>(this.apiUrl + '/documents/analyseDocuments', { question }).pipe(
+      map(response => response.data)
+    );
   }
 }

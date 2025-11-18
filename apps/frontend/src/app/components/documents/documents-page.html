@@ -100,7 +100,7 @@
             type="text" 
             class="form-control" 
             placeholder="Search documents..."
-            [(ngModel)]="searchQuery"
+            [(ngModel)]="prompt"
             (keyup.enter)="onSearch()"
         >
         </div>
@@ -108,11 +108,11 @@
     </div>
 
     <!-- Search Results Section -->
-    @if(searchResults() && searchResults()!.length > 0 || isLoading()) {
+    @if(promptResult() || isLoading()) {
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">
-                    <i class="bi bi-file-earmark-text me-2"></i>Search Results
+                    <i class="bi bi-file-earmark-text me-2"></i>Agent Response
                 </h5>
             </div>
             <div class="card-body">
@@ -125,33 +125,13 @@
                     </div>
                 }
                 
-                @if(!isLoading() && searchResults() && searchResults()!.length > 0) {
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Document Name</th>
-                                    <th>Summary</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for(result of searchResults()!; track result) {
-                                    <tr>
-                                        <td>{{ result.name }}</td>
-                                        <td>{{ result.summary || 'No summary available' }}</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                @if(!isLoading() && promptResult()) {
+                    <div class="text-center py-4">
+                        <p class="mt-2">{{ promptResult() }}</p>
                     </div>
                 }
 
-                @if(!isLoading() && searchResults() && searchResults()!.length === 0) {
-                    <div class="text-center py-4">
-                        <i class="bi bi-exclamation-triangle text-warning fs-1"></i>
-                        <p class="mt-2">No documents found matching your search.</p>
-                    </div>
-                }
             </div>
         </div>
     }
+</div>

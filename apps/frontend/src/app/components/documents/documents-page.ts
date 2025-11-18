@@ -5,7 +5,6 @@ import { DocumentDTO } from '@basic-angular-nestjs-rag/sharedDTO';
 import * as pdfjsLib from 'pdfjs-dist';
 import { GlobalWorkerOptions } from 'pdfjs-dist';
 import { firstValueFrom } from 'rxjs';
-import { DomSanitizer } from '@angular/platform-browser';
 
 // IMPORTANT: Configure the worker source for pdfjs-dist
 // Ensure you have copied 'pdf.worker.mjs' or 'pdf.worker.js' to your assets folder
@@ -24,8 +23,8 @@ export class DocumentsPageComponent {
   isProcessing = signal(false);
   processingStatus = signal<string | null>(null);
   uploadStatus = signal<string | null>(null);
-  searchQuery = signal('');
-  searchResults = signal<any[]>([]);
+  prompt = signal('');
+  promptResult = signal<string>('');
   isLoading = signal(false);
   private documentService = inject(DocumentService);
 
@@ -83,14 +82,13 @@ export class DocumentsPageComponent {
       // Upload documents in batches
       for (let i = 0; i < allDocumentsData.length; i += BATCH_SIZE) {
         const batch = allDocumentsData.slice(i, i + BATCH_SIZE);
-        this.processingStatus.set(`Uploading batch ${Math.floor(i / BATCH_SIZE) + 1} of ${Math.ceil(allDocumentsData.length / BATCH_SIZE)} (${batch.length} documents)...`);
+        this.processingStatus.set(`Processing batch ${Math.floor(i / BATCH_SIZE) + 1} of ${Math.ceil(allDocumentsData.length / BATCH_SIZE)} (${batch.length} documents)...`);
         
         // Use firstValueFrom to handle the Observable as a Promise and wait for completion
         await firstValueFrom(this.documentService.uploadByPage(batch));
         console.log(`Batch starting at index ${i} uploaded successfully.`);
       }
 
-      this.processingStatus.set('All documents processed and uploaded successfully in batches!');
       this.uploadStatus.set('success');
       this.isProcessing.set(false);
       this.selectedFiles.set([]); // Clear selected files after successful upload
@@ -141,11 +139,11 @@ export class DocumentsPageComponent {
   }
 
   onSearch(): void {
-    if (this.searchQuery().trim()) {
+    if (this.prompt().trim()) {
       this.isLoading.set(true);
-      this.documentService.analyseDocuments(this.searchQuery()).subscribe({
-        next: (results: any) => {
-          this.searchResults.set(results || []);
+      this.documentService.analyseDocuments(this.prompt()).subscribe({
+        next: (result: string) => {
+          this.promptResult.set(result || '');
           this.isLoading.set(false);
         },
         error: (error) => {

@@ -19,7 +19,7 @@ export class RerankService implements OnModuleInit, OnModuleDestroy {
 
     this.model = await this.llama.loadModel({
         modelPath: path.join(__dirname, "assets/modelzoo/Qwen3-Reranker-0.6B.Q4_K_M.gguf"),
-        gpuLayers: 10
+        gpuLayers: 5
     });
     this.context = await this.model.createRankingContext({
         threads: 15, 

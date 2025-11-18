@@ -12,13 +12,15 @@ export class AppController {
   }
 
   @Post('documents/uploadbypage')
-  uploadDocument(@Body() documents: Partial<DocumentDTO>[]){
-    this.documentService.save(documents);
+  async uploadDocument(@Body() documents: Partial<DocumentDTO>[]){
+    const resp = await this.documentService.save(documents);
+    return resp;
   }
 
   @Post('documents/analyseDocuments')
-  analyseDocuments(@Body() body: any){
-    this.documentService.analyseDocuments(body.question);
+  async analyseDocuments(@Body() body: any){
+    const resp = await this.documentService.analyseDocuments(body.question);
+    return  resp;
   }
 
 }
