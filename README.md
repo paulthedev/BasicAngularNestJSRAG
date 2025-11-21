@@ -31,7 +31,7 @@ This project follows a monorepo structure using Nx:
 
 # Re-ranker Configuration
 This is the only offline model we are using.
-Download Qwen3-Reranker-0.6B.Q4_K_M.gguf from https://huggingface.co/giladgd/Qwen3-Reranker-0.6B-GGUF and place it in assets/modelzoo
+Download Qwen3-Reranker-0.6B.Q4_K_M.gguf from https://huggingface.co/giladgd/Qwen3-Reranker-0.6B-GGUF and place it in backend/assets/modelzoo
 
 ## Environment Variables
 
