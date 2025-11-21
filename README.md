@@ -54,3 +54,4 @@ Use the app opening http://localhost:4200 in a browser.
 - [node-llama-cpp](https://github.com/ggerganov/node-llama-cpp)(llama.cpp node bindings)
 - [llama.cpp](https://github.com/ggml-org/llama.cpp)
 - [langchain](https://docs.langchain.com/oss/javascript/langchain/overview)
+- [pgvector] (https://github.com/pgvector/pgvector)
