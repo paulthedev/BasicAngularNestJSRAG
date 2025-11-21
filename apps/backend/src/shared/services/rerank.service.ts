@@ -10,8 +10,9 @@ export class RerankService {
   }
 
   async reRankDocuments(query: string, documents: Document[]): Promise<Document[]> {
+    const vectorizedQuery = await this.embeddingsService.generateEmbedding(query);
     const rankedDocuments = await Promise.all(documents.map(async (p) => {
-      const score = await this.calculateSimilarityScore(query, p.content);
+      const score = await this.calculateSimilarityScore(vectorizedQuery, p.embedding);
       return ({content: p.content, score: score});
     }));
     rankedDocuments.sort((a, b) => b.score - a.score); //sort by highest score first
@@ -19,9 +20,7 @@ export class RerankService {
     return documents.filter(p => (highRankDocuments.map(hrp => hrp.content)).some(d => d == p.content));
   }
 
-  async calculateSimilarityScore(q1:string, q2: string){
-    const vectorizedq1 = await this.embeddingsService.generateEmbedding(q1);
-    const vectorizedq2 = await this.embeddingsService.generateEmbedding(q2);
-    return this.similarity(vectorizedq1, vectorizedq2);
+  async calculateSimilarityScore(q1:number[], q2: number[]){
+    return this.similarity(q1, q2);
   }
 }
