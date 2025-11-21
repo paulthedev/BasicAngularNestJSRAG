@@ -1,40 +1,27 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import path from "path";
-import { Llama, LlamaModel, LlamaRankingContext } from "node-llama-cpp";
+import { Injectable } from '@nestjs/common';
 import { Document } from '../entities/document.entity';
-
+import { EmbeddingsService } from './embeddings.service';
 @Injectable()
-export class RerankService implements OnModuleInit, OnModuleDestroy {
-  private llama!: Llama;
-  private model!: LlamaModel;
-  private context!: LlamaRankingContext;
+export class RerankService {
+  similarity = require( 'compute-cosine-similarity' );
 
-  async onModuleInit() {
-    const {getLlama} = await (eval(`import("node-llama-cpp")`) as Promise<any>);
-    this.llama = await getLlama({
-    gpu: {
-        type: "auto",
-        exclude: ["cuda"]
-    }});
+  constructor(private readonly embeddingsService: EmbeddingsService,){
 
-    this.model = await this.llama.loadModel({
-        modelPath: path.join(__dirname, "assets/modelzoo/Qwen3-Reranker-0.6B.Q4_K_M.gguf"),
-        gpuLayers: 10
-    });
-    this.context = await this.model.createRankingContext({
-        threads: 15, 
-        contextSize: 10000});
   }
 
   async reRankDocuments(query: string, documents: Document[]): Promise<Document[]> {
-    const contents = documents.map(p => p.content);
-    const rankedDocuments = await this.context.rankAndSort(query, contents);
-    const highRankDocuments = await rankedDocuments.filter(rp => rp.score > 0.51);
-    return documents.filter(p => (highRankDocuments.map(hrp => hrp.document)).some(d => d == p.content));
+    const rankedDocuments = await Promise.all(documents.map(async (p) => {
+      const score = await this.calculateSimilarityScore(query, p.content);
+      return ({content: p.content, score: score});
+    }));
+    rankedDocuments.sort((a, b) => b.score - a.score); //sort by highest score first
+    const highRankDocuments = rankedDocuments.filter(rp => rp.score > 0.51); //are the documents relevant to the quey?
+    return documents.filter(p => (highRankDocuments.map(hrp => hrp.content)).some(d => d == p.content));
   }
 
-  async onModuleDestroy() {
-    this.context.dispose();
-    this.model.dispose();
+  async calculateSimilarityScore(q1:string, q2: string){
+    const vectorizedq1 = await this.embeddingsService.generateEmbedding(q1);
+    const vectorizedq2 = await this.embeddingsService.generateEmbedding(q2);
+    return this.similarity(vectorizedq1, vectorizedq2);
   }
 }

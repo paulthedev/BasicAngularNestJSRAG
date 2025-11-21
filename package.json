@@ -26,9 +26,8 @@
     "axios": "^1.6.0",
     "bootstrap": "^5.3.6",
     "bootstrap-icons": "^1.13.1",
+    "compute-cosine-similarity": "^1.1.0",
     "express": "^5.1.0",
-    "multer": "^2.0.2",
-    "node-llama-cpp": "^3.14.2",
     "pdfjs-dist": "^5.4.394",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.8.0",
@@ -60,10 +59,8 @@
     "@swc/core": "^1.15.2",
     "@swc/helpers": "~0.5.11",
     "@types/express": "^5.0.1",
-    "@types/multer": "^2.0.0",
     "@types/node": "^20.19.9",
     "@types/pdfjs-dist": "^2.10.377",
-    "@types/uuid": "^10.0.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
     "jsonc-eslint-parser": "^2.1.0",
@@ -71,10 +68,6 @@
     "prettier": "^2.6.2",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",
-    "uuid": "^13.0.0",
     "webpack-cli": "^5.1.4"
-  },
-  "overrides": {
-    "js-yaml": "~4.1.1"
   }
 }

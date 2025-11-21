@@ -16,9 +16,7 @@ export class EmbeddingsService implements OnModuleInit {
   }
 
   async generateEmbedding(text: string): Promise<number[]> {
-    const sanitizedText = text.trim().replace(/\s+/g, ' ').toLowerCase().normalize('NFKC')
-    console.log('Now Embedding: ');
-    console.log(sanitizedText);
+    const sanitizedText = text.trim().replace(/\s+/g, ' ').toLowerCase().normalize('NFKC');
     const embeddings = this.model.embedQuery(sanitizedText);
     return embeddings;
   }
