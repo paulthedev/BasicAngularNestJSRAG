@@ -7,6 +7,7 @@ import { RerankService } from './rerank.service';
 import { PaginationOptionsDTO, PaginatedResultDTO, DocumentDTO, ResponseDTO, ResponseStatusCode } from '@basic-angular-nestjs-rag/sharedDTO';
 import { DocumentMapper } from '../mappers/document.mapper';
 import { ChatService } from './chat.service';
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 
 @Injectable()
 export class DocumentsService {
@@ -28,7 +29,7 @@ export class DocumentsService {
 
         // Apply text search if provided
         if (query) {
-            const queryEmbedding = (await this.embeddingsService.generateEmbedding(query)).vector;
+            const queryEmbedding = (await this.embeddingsService.generateEmbedding(query));
             queryBuilder.orderBy(
                 `documents.embedding <=> :queryEmbedding`,
                 'ASC'
@@ -70,7 +71,7 @@ export class DocumentsService {
         }
 
         try {
-            const queryEmbedding = (await this.embeddingsService.generateEmbedding(question)).vector;
+            const queryEmbedding = await this.embeddingsService.generateEmbedding(question);
             
             // Create query builder and apply similarity search
             const queryBuilder = this.documentepository.createQueryBuilder('document');
@@ -101,17 +102,37 @@ export class DocumentsService {
                 };
             }
 
-            // Concatenate document contents for context
-            const concatAllDocuments = rerankedDocuments.map(i => i.content).join(' ');
-
             // Create a prompt template that incorporates the document context
-            const promptTemplate = `You are a helpful, respectful and honest assistant. Always answer as helpfully as possible. `
-            + `If a question does not make any sense, or is not factually coherent, explain why instead of answering something incorrectly. `
-            + `If you don't know the answer to a question, don't share false information. `
-            + `Based on the following document(s) content, please answer the question: "${question}"\n\n`
-            + concatAllDocuments;
+            const systemMessage: SystemMessage = new SystemMessage({
+                content: [
+                    {
+                        type: "text",
+                        text: `You are a helpful, respectful and honest assistant. Always answer as helpfully as possible.`
+                    },
+                    {
+                        type: "text",
+                        text: `If a question does not make any sense, or is not factually coherent, explain why instead of answering something incorrectly.`
+                    },
+                    {
+                        type: "text",
+                        text: `If you don't know the answer to a question, don't share false information.`
+                    }
+                ]
+            });
+
+                     // Create a prompt template that incorporates the document context
+            const humanMessage: HumanMessage = new HumanMessage({
+                content: [
+                    {
+                        type: "text",
+                        text:`Based on the following document(s) content, please answer the question: "${question}"`
+                    }
+                ]
+            });
+            const documentsAsBlock = rerankedDocuments.map<any>(rd => ({type: "text", text: rd.content, }));
+            humanMessage.content = [...humanMessage.content, ...documentsAsBlock];
             
-            const response = await this.chatService.prompt(promptTemplate);
+            const response = await this.chatService.prompt([systemMessage, humanMessage]);
 
             return {
                     statusCode: ResponseStatusCode.success,
@@ -128,7 +149,7 @@ export class DocumentsService {
         try{
             entities = await Promise.all(entities.map(async (e) => {
                 e.embedding = [...(await this.embeddingsService.generateEmbedding(
-                `Document name: ${e.name} Page number: ${e.page} Document content: ${e.content}`)).vector];
+                `Document name: ${e.name} Page number: ${e.page} Document content: ${e.content}`))];
                 return e;
             }));
 
