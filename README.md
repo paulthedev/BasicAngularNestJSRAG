@@ -35,7 +35,7 @@ Download Qwen3-Reranker-0.6B.Q4_K_M.gguf from https://huggingface.co/giladgd/Qwe
 
 ## Environment Variables
 
-The application uses environment variables for configuration. Create a `.env` file in the backend directory with the following variables:
+The application uses environment variables for configuration. Edit the `.env` file in the backend directory with the following variables:
 - GEMINI_API_KEY=your_gemini_api_key_here
 
 To run the application run the following commands sequentially:
