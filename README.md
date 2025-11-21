@@ -40,8 +40,10 @@ The application uses environment variables for configuration. Create a `.env` fi
 
 To run the application run the following commands sequentially:
 - npm install
-- npx nx serve frontend
 - npx nx serve backend
+- npx nx serve frontend
+
+Use the app opening http://localhost:4200 in a browser.
 
 ![alt text](image.png)
 
