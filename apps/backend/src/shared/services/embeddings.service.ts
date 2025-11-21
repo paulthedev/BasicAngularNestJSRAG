@@ -10,7 +10,8 @@ export class EmbeddingsService implements OnModuleInit {
       this.model = new GoogleGenerativeAIEmbeddings({
         apiKey: process.env.GEMINI_API_KEY || '',
         modelName: 'gemini-embedding-001',
-        maxRetries: 2
+        maxRetries: 2,
+        maxConcurrency: 4
       });
   }
 
