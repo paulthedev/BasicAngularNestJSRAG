@@ -39,9 +39,9 @@ The application uses environment variables for configuration. Create a `.env` fi
 - GEMINI_API_KEY=your_gemini_api_key_here
 
 To run the application run the following commands sequentially:
-npm install
-npx nx serve frontend
-npx nx serve backend
+- npm install
+- npx nx serve frontend
+- npx nx serve backend
 
 ![alt text](image.png)
 
