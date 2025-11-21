@@ -23,8 +23,8 @@ This project follows a monorepo structure using Nx:
 - **Backend**: NestJS server with REST APIs
 - **RAG Integration**: 
   - Embeddings: Using langchain.js and Google's Gemini API(gemini-embedding-001)
-  - LLM Generation: Using langchain.js and Google's Gemini API(gemini-2.5-flash-lite)  
   - Reranking: Using node-llama-cpp for local inference([giladgd/Qwen3-Reranker-0.6B-GGUF])
+  - LLM Generation: Using langchain.js and Google's Gemini API(gemini-2.5-flash-lite)  
 - **Document Management**: CRUD operations for documents
 - **Vector Database**: PostgreSQL with pgvector extension for document embeddings and retrieval
 - **Search Functionality**: RAG-based search and content generation
@@ -54,4 +54,4 @@ Use the app opening http://localhost:4200 in a browser.
 - [node-llama-cpp](https://github.com/ggerganov/node-llama-cpp)(llama.cpp node bindings)
 - [llama.cpp](https://github.com/ggml-org/llama.cpp)
 - [langchain](https://docs.langchain.com/oss/javascript/langchain/overview)
-- [pgvector] (https://github.com/pgvector/pgvector)
+- [pgvector](https://github.com/pgvector/pgvector)
