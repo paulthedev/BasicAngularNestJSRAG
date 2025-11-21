@@ -43,6 +43,7 @@ npm install
 npx nx serve frontend
 npx nx serve backend
 
+![alt text](image.png)
 
 ## Acknowledgments
 
