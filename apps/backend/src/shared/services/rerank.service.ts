@@ -16,7 +16,7 @@ export class RerankService {
       return ({content: p.content, score: score});
     }));
     rankedDocuments.sort((a, b) => b.score - a.score); //sort by highest score first
-    const highRankDocuments = rankedDocuments.filter(rp => rp.score > 0.51); //are the documents relevant to the quey?
+    const highRankDocuments = rankedDocuments.filter(rp => rp.score > 0.59); //are the documents relevant to the quey?
     return documents.filter(p => (highRankDocuments.map(hrp => hrp.content)).some(d => d == p.content));
   }
 
